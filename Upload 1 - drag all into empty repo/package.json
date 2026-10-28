@@ -1,0 +1,20 @@
+{
+  "name": "sigi",
+  "version": "1.0.0",
+  "description": "SIGI (Should I Get It?): check products, food and cars for recalls before you buy.",
+  "private": true,
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch --env-file=.env server.js",
+    "data": "python3 scripts/build_data.py"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "compression": "^1.7.5",
+    "express": "^4.21.2"
+  }
+}
