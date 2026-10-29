@@ -1,0 +1,1286 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>SIGI · Should I Get It?</title>
+<meta name="description" content="Check products, food and cars for recalls before you buy, and keep watch over what you own.">
+<meta name="theme-color" content="#F4F7FB" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0E1621" media="(prefers-color-scheme: dark)">
+<link rel="icon" type="image/png" href="img/icon-192.png">
+<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta property="og:title" content="SIGI · Should I Get It?">
+<meta property="og:description" content="Check for recalls. Shop with confidence.">
+<meta property="og:image" content="img/icon-512.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@800;900&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: sign-in screen, then a one-screen phone app (logo masthead, scrolling panel, 4-tab bar). Palette taken from the SIGI logo; verdicts are store hang-tags. */
+:root{
+  --paper:#F4F7FB; --card:#FFFFFF; --ink:#13243A; --muted:#5C6B7E; --line:#D9E1EB;
+  --accent:#1462AE; --accent-ink:#FFFFFF; --soft:#E5EEF8; --logo-bg:#FFFFFF;
+  --get:#1F7A4D; --get-bg:#E3F3EA; --check:#9A6200; --check-bg:#FDF1D8; --skip:#B3261E; --skip-bg:#FBE4E1;
+  --display:"Nunito","Arial Rounded MT Bold","Trebuchet MS",sans-serif;
+  --body:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#0E1621; --card:#16212E; --ink:#E5ECF4; --muted:#93A3B6; --line:#283546;
+  --accent:#6AB0F5; --accent-ink:#06192C; --soft:#1C2A3A; --logo-bg:#EEF4FA;
+  --get:#6DD39A; --get-bg:#13291F; --check:#F2BE5C; --check-bg:#2C2414; --skip:#FF8A80; --skip-bg:#33191A; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#0E1621; --card:#16212E; --ink:#E5ECF4; --muted:#93A3B6; --line:#283546;
+  --accent:#6AB0F5; --accent-ink:#06192C; --soft:#1C2A3A; --logo-bg:#EEF4FA;
+  --get:#6DD39A; --get-bg:#13291F; --check:#F2BE5C; --check-bg:#2C2414; --skip:#FF8A80; --skip-bg:#33191A; color-scheme:dark}
+html,body{height:100%}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0;-webkit-text-size-adjust:100%}
+img{max-width:100%}
+
+body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.45}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--paper)}
+.gut{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+p{margin:0}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* ---------- sign-in ---------- */
+#auth{min-height:100%;display:flex;flex-direction:column;justify-content:center;padding-block:28px}
+.auth-in{max-width:420px;width:100%;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+.logo-card{background:var(--logo-bg);border-radius:28px;padding:18px 18px 6px;display:flex;justify-content:center}
+.logo-card img{width:min(300px,78%);height:auto;display:block}
+.auth-h{font-family:var(--display);font-weight:900;font-size:30px;line-height:1.1;margin:0 0 6px;text-align:center;text-wrap:balance}
+.auth-sub{text-align:center;color:var(--muted);font-size:15px;text-wrap:balance}
+.proof{display:flex;justify-content:center;gap:18px;flex-wrap:wrap;font-family:var(--mono);font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.proof b{display:block;font-family:var(--display);font-size:22px;color:var(--ink);font-weight:900}
+.proof div{text-align:center}
+.auth-btns{display:flex;flex-direction:column;gap:10px}
+.btn-claude{display:flex;align-items:center;justify-content:center;gap:10px}
+.btn-claude img{width:24px;height:24px;border-radius:50%}
+.fine{font-size:12.5px;color:var(--muted);text-align:center;text-wrap:balance}
+
+/* ---------- app shell ---------- */
+#app{height:100%;display:flex;flex-direction:column}
+header{padding-block:10px 8px;display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line);background:var(--paper)}
+.mark{background:var(--logo-bg);border-radius:12px;padding:3px 8px;display:flex}
+.mark img{height:34px;width:auto;display:block}
+.hello{font-size:13px;color:var(--muted);text-align:right;line-height:1.25}
+.hello b{display:block;color:var(--ink);font-size:14px}
+main{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.panel{padding-block:18px 28px;max-width:640px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+h2{font-family:var(--display);font-weight:900;font-size:27px;line-height:1.1;margin:0;text-wrap:balance}
+h3{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:6px 0 0;font-weight:700}
+.sub{color:var(--muted);font-size:14px}
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;background:var(--soft);border-radius:12px;padding:3px;gap:3px}
+.seg button{border:0;background:transparent;color:var(--muted);font:600 14px var(--body);padding:9px 6px;border-radius:9px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--card);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.field{display:flex;gap:8px}
+input[type=text],select{width:100%;min-width:0;font:500 16px var(--body);color:var(--ink);background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:12px}
+input[type=text]:focus,select:focus{outline:none;border-color:var(--accent)}
+.btn{font:700 15px var(--body);border:0;border-radius:12px;padding:13px 16px;cursor:pointer;background:var(--accent);color:var(--accent-ink);white-space:nowrap;text-decoration:none;text-align:center}
+.btn.ghost{background:transparent;color:var(--accent);border:1.5px solid var(--accent)}
+.btn.plain{background:var(--soft);color:var(--ink)}
+.btn.small{padding:8px 12px;font-size:13px;border-radius:10px}
+.btn.danger{background:transparent;color:var(--skip);border:1.5px solid var(--line)}
+.btn:focus-visible,.seg button:focus-visible,.tab:focus-visible,.chip:focus-visible,.item:focus-visible,.hist:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.btn:disabled{opacity:.5;cursor:default}
+.icon-btn{width:48px;flex:none;display:grid;place-items:center;padding:0}
+.hint{font-size:13px;color:var(--muted)}
+.examples{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:500 13px var(--body);background:var(--card);border:1px solid var(--line);color:var(--ink);border-radius:999px;padding:6px 11px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.vrow{display:grid;grid-template-columns:1.2fr 1.4fr .9fr;gap:8px}
+@media (max-width:420px){.vrow{grid-template-columns:1fr 1fr}.vrow select:first-child{grid-column:1/-1}}
+
+/* hang-tag verdict */
+.tag{position:relative;background:var(--card);border-radius:6px 20px 20px 6px;padding:18px 18px 16px 30px;border:1.5px solid var(--vline,var(--line));display:flex;flex-direction:column;gap:8px}
+.tag::before{content:"";position:absolute;left:11px;top:22px;width:10px;height:10px;border-radius:50%;background:var(--paper);border:1.5px solid var(--vline,var(--line))}
+.tag .word{font-family:var(--display);font-weight:900;font-size:42px;line-height:.95;color:var(--vc)}
+.tag .why{font-size:14px}
+.tag.get{--vc:var(--get);--vline:var(--get);background:var(--get-bg)}
+.tag.check{--vc:var(--check);--vline:var(--check);background:var(--check-bg)}
+.tag.skip{--vc:var(--skip);--vline:var(--skip);background:var(--skip-bg)}
+.tag .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+
+.list{display:flex;flex-direction:column;gap:10px}
+.rc{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px 14px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.rc .meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-family:var(--mono);font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.rc .t{font-weight:700;font-size:15px;line-height:1.3;overflow-wrap:anywhere}
+.rc .d{font-size:13.5px;color:var(--muted);overflow-wrap:anywhere}
+.rc .d b{color:var(--ink);font-weight:600}
+.rc a,.link{color:var(--accent);font-weight:600;font-size:13.5px;text-decoration:none}
+.rc a:hover,.link:hover{text-decoration:underline}
+.pill{font:700 10.5px var(--body);letter-spacing:.06em;text-transform:uppercase;padding:3px 7px;border-radius:5px;background:var(--soft);color:var(--ink)}
+.pill.hot{background:var(--skip);color:var(--card)}
+.pill.warn{background:var(--check);color:var(--card)}
+.pill.ok{background:var(--get);color:var(--card)}
+.strength{display:inline-flex;gap:2px;vertical-align:middle}
+.strength i{width:6px;height:10px;border-radius:2px;background:var(--line)}
+.strength i.on{background:var(--ink)}
+
+.item{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;cursor:pointer}
+.dot{display:inline-block;width:12px;height:12px;border-radius:50%;flex:none}
+.dot.get{background:var(--get)}.dot.check{background:var(--check)}.dot.skip{background:var(--skip)}
+.item .n{font-weight:700;overflow-wrap:anywhere}
+.item .s{font-size:13px;color:var(--muted)}
+.item button.x{border:0;background:none;color:var(--muted);font-size:20px;cursor:pointer;padding:4px 8px;border-radius:6px}
+.empty{border:1.5px dashed var(--line);border-radius:14px;padding:20px;text-align:center;color:var(--muted);font-size:14px}
+.note{font-size:12.5px;color:var(--muted)}
+.ai{background:var(--soft);border-radius:14px;padding:12px 14px;font-size:14px;display:flex;flex-direction:column;gap:6px}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;vertical-align:-2px}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.spinner{animation-duration:3s}}
+
+/* account */
+.me{display:flex;gap:14px;align-items:center}
+.me img{width:56px;height:56px;border-radius:50%;flex:none;background:var(--logo-bg);object-fit:contain}
+.me .nm{font-family:var(--display);font-weight:900;font-size:22px;line-height:1.1;overflow-wrap:anywhere}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;font-size:12px;color:var(--muted)}
+.stat b{display:block;font-family:var(--display);font-weight:900;font-size:26px;color:var(--ink);font-variant-numeric:tabular-nums;line-height:1.1}
+.stat.alert b{color:var(--skip)}
+.rows{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.rows > div{padding:12px 14px;display:flex;justify-content:space-between;gap:12px;align-items:center;border-top:1px solid var(--line);font-size:14px}
+.rows > div:first-child{border-top:0}
+.rows > div > span:last-child{color:var(--muted);text-align:right;min-width:0;overflow-wrap:anywhere}
+.hist{border:0;background:var(--card);border-top:1px solid var(--line);width:100%;text-align:left;padding:11px 14px;font:500 14px var(--body);color:var(--ink);display:flex;justify-content:space-between;align-items:center;gap:10px;cursor:pointer}
+.hist:first-child{border-top:0}
+.hist .l{display:flex;align-items:center;gap:10px;min-width:0;overflow-wrap:anywhere}
+.hist .w{color:var(--muted);font-size:12px;font-family:var(--mono);flex:none}
+
+nav{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);background:var(--card);padding-bottom:env(safe-area-inset-bottom,0px)}
+.tab{border:0;background:none;padding:10px 2px 12px;font:600 11.5px var(--body);color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;position:relative}
+.tab svg{width:22px;height:22px}
+.tab[aria-selected="true"]{color:var(--accent)}
+.badge{position:absolute;top:6px;left:calc(50% + 6px);background:var(--skip);color:#fff;font:700 10px var(--body);border-radius:999px;padding:1px 5px;min-width:16px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:12px;font-weight:600;font-size:14px;z-index:20;max-width:calc(100% - 32px)}
+.loading{padding:40px 0;text-align:center;color:var(--muted)}
+
+/* email sign-in */
+.auth-form{display:flex;flex-direction:column;gap:10px}
+.auth-form input[type=email]{width:100%;min-width:0;font:500 16px var(--body);color:var(--ink);background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:13px}
+.auth-form input[type=email]:focus{outline:none;border-color:var(--accent)}
+.or{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.08em}
+.or::before,.or::after{content:"";flex:1;height:1px;background:var(--line)}
+.sent{background:var(--get-bg);color:var(--ink);border:1.5px solid var(--get);border-radius:14px;padding:14px;font-size:14px;text-align:center}
+
+/* ---------- scan button ---------- */
+.scan-cta{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:15px 16px;font-size:16px}
+
+/* ---------- switches ---------- */
+.switch{appearance:none;-webkit-appearance:none;width:46px;height:28px;border-radius:999px;background:var(--line);position:relative;cursor:pointer;margin:0;transition:background .2s;flex:none}
+.switch::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:var(--card);box-shadow:0 1px 3px rgba(0,0,0,.3);transition:transform .2s}
+.switch:checked{background:var(--accent)}
+.switch:checked::after{transform:translateX(18px)}
+.switch:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.rows label{cursor:pointer}
+
+/* ---------- live scanner ---------- */
+.scanner{position:fixed;inset:0;z-index:50;background:#000;color:#fff;overflow:hidden;touch-action:none}
+.scanner video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.scan-frame{position:absolute;left:12%;top:32%;width:76%;height:24%;border-radius:18px;
+  box-shadow:0 0 0 200vmax rgba(0,0,0,.55);
+  transition:left .18s ease-out,top .18s ease-out,width .18s ease-out,height .18s ease-out,border-color .15s;
+  --corner:#fff}
+.scan-frame .c{position:absolute;width:34px;height:34px;border:4px solid var(--corner);animation:breathe 1.4s ease-in-out infinite}
+.scan-frame .tl{left:-2px;top:-2px;border-right:0;border-bottom:0;border-top-left-radius:16px;--dx:-1;--dy:-1}
+.scan-frame .tr{right:-2px;top:-2px;border-left:0;border-bottom:0;border-top-right-radius:16px;--dx:1;--dy:-1}
+.scan-frame .bl{left:-2px;bottom:-2px;border-right:0;border-top:0;border-bottom-left-radius:16px;--dx:-1;--dy:1}
+.scan-frame .br{right:-2px;bottom:-2px;border-left:0;border-top:0;border-bottom-right-radius:16px;--dx:1;--dy:1}
+@keyframes breathe{0%,100%{transform:translate(0,0)}50%{transform:translate(calc(var(--dx)*7px),calc(var(--dy)*7px))}}
+.scan-frame .laser{position:absolute;left:6%;right:6%;top:50%;height:2px;background:#FF4B3E;box-shadow:0 0 12px 2px rgba(255,75,62,.75);border-radius:2px;animation:sweep 1.8s ease-in-out infinite}
+@keyframes sweep{0%,100%{transform:translateY(-38px);opacity:.35}50%{transform:translateY(38px);opacity:1}}
+.scan-frame.tracking{--corner:#F2AE1C}
+.scan-frame.tracking .c{animation-duration:.5s}
+.scan-frame.locked{--corner:#3DDC84}
+.scan-frame.locked .c{animation:none}
+.scan-frame.locked .laser,.scan-frame.tracking .laser{opacity:0;animation:none}
+.scan-top{position:absolute;left:0;right:0;top:0;display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:calc(env(safe-area-inset-top,0px) + 12px) max(14px,env(safe-area-inset-right,0px)) 12px max(14px,env(safe-area-inset-left,0px));
+  background:linear-gradient(rgba(0,0,0,.55),transparent)}
+.scan-title{font:800 17px var(--display);letter-spacing:.01em}
+.scan-tools{display:flex;gap:8px}
+.scan-btn{width:44px;height:44px;border-radius:50%;border:0;background:rgba(255,255,255,.16);color:#fff;display:grid;place-items:center;cursor:pointer;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.scan-btn[aria-pressed="true"]{background:#fff;color:#111}
+#scan-beep .off{display:none}
+#scan-beep[aria-pressed="false"] .on{display:none}
+#scan-beep[aria-pressed="false"] .off{display:block}
+#scan-beep[aria-pressed="false"]{background:rgba(255,255,255,.16);color:#fff}
+.scan-btn:focus-visible,.scan-pill:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.scan-bottom{position:absolute;left:0;right:0;bottom:0;display:flex;flex-direction:column;align-items:center;gap:14px;
+  padding:28px max(16px,env(safe-area-inset-right,0px)) calc(env(safe-area-inset-bottom,0px) + 22px) max(16px,env(safe-area-inset-left,0px));
+  background:linear-gradient(transparent,rgba(0,0,0,.7))}
+.scan-msg{margin:0;font:600 15px var(--body);text-align:center;text-wrap:balance;min-height:1.4em}
+.scan-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.scan-pill{border:1.5px solid rgba(255,255,255,.6);background:rgba(0,0,0,.25);color:#fff;font:600 14px var(--body);padding:10px 16px;border-radius:999px;cursor:pointer}
+@media (prefers-reduced-motion:reduce){.scan-frame .c,.scan-frame .laser{animation:none}.scan-frame{transition:none}}
+
+/* scanned product header */
+.scanned{display:flex;gap:12px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.scanned svg{flex:none;color:var(--accent)}
+.scanned .t{font-weight:700;overflow-wrap:anywhere;line-height:1.3}
+.scanned .s{font-family:var(--mono);font-size:12px;color:var(--muted);overflow-wrap:anywhere}
+
+/* ---------- live data ---------- */
+.live-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--get);margin-right:6px;vertical-align:1px;box-shadow:0 0 0 0 var(--get);animation:pulse 2s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(31,122,77,.45)}70%{box-shadow:0 0 0 7px rgba(31,122,77,0)}100%{box-shadow:0 0 0 0 rgba(31,122,77,0)}}
+@media (prefers-reduced-motion:reduce){.live-dot{animation:none}}
+.pill.new{background:var(--accent);color:var(--accent-ink)}
+.head-row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+
+/* ---------- recall cards with pictures + share ---------- */
+.rc-main{display:flex;gap:12px;align-items:flex-start}
+.rc-text{display:flex;flex-direction:column;gap:6px;min-width:0;flex:1}
+.thumb{width:76px;height:76px;object-fit:contain;border-radius:10px;background:#fff;border:1px solid var(--line);flex:none}
+.rc-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:2px}
+.share-btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--soft);color:var(--ink);font:600 13px var(--body);padding:6px 11px;border-radius:999px;cursor:pointer}
+.share-btn:hover{border-color:var(--accent)}
+.share-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.item-btns{display:flex;align-items:center;gap:2px}
+.item button.x svg{display:block}
+.pimg{width:64px;height:64px;object-fit:contain;border-radius:10px;background:#fff;border:1px solid var(--line);flex:none}
+
+/* ---------- safer alternatives ---------- */
+.alts{display:flex;flex-direction:column;gap:10px;background:var(--card);border:1.5px solid var(--get);border-radius:14px;padding:14px}
+.alts h3{margin:0;color:var(--get)}
+.alts-head{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.ad{font:600 10.5px var(--body);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line);border-radius:5px;padding:2px 6px}
+.alt-cta,.alt-pick{display:flex;align-items:center;justify-content:space-between;gap:12px;text-decoration:none;color:var(--ink);background:var(--get-bg);border-radius:12px;padding:12px 14px}
+.alt-cta b,.alt-pick b{display:block;font-size:15px}
+.alt-cta small,.alt-pick small{display:block;color:var(--muted);font-size:13px;margin-top:2px}
+.alt-cta:hover,.alt-pick:hover{outline:1.5px solid var(--get)}
+.alt-pick{background:var(--soft)}
+.alt-ok{width:26px;height:26px;border-radius:50%;background:var(--get);color:var(--card);display:grid;place-items:center;font-weight:800;flex:none}
+.ok-note{color:var(--get)!important;font-weight:600}
+.fine-l{font-size:12px;color:var(--muted);margin:0}
+
+</style>
+</head>
+<body>
+
+<!-- ============ SIGN IN ============ -->
+<section id="auth" class="gut">
+  <div class="auth-in">
+    <div class="logo-card"><img src="img/logo.png" alt="SIGI. Should I Get It? Check for recalls. Shop with confidence." width="640" height="640"></div>
+    <div>
+      <h1 class="auth-h">Know before you buy</h1>
+      <p class="auth-sub">Check products, food and cars against official U.S. recall notices, and keep watch over what you already own.</p>
+    </div>
+    <div class="proof" id="proof">
+      <div><b>CPSC</b>products</div><div><b>FDA</b>food</div><div><b>NHTSA</b>cars &amp; seats</div>
+    </div>
+    <form class="auth-form" id="login-form">
+      <label class="sr" for="email">Email address</label>
+      <input type="email" id="email" placeholder="you@example.com" autocomplete="email" required>
+      <button class="btn" type="submit" id="login-btn">Email me a sign-in link</button>
+    </form>
+    <div class="sent" id="sent" hidden></div>
+    <div class="or">or</div>
+    <button class="btn plain" id="guest">Continue as guest</button>
+    <p class="fine" id="auth-fine">No password needed. We email you a one-tap sign-in link. Signed in, your list is private and syncs across your devices. Guest lists stay on this device.</p>
+  </div>
+</section>
+
+<!-- ============ APP ============ -->
+<div id="app" hidden>
+<header class="gut">
+  <div class="mark"><img src="img/logo-mark.png" alt="SIGI" width="360" height="228"></div>
+  <div class="hello" id="hello"></div>
+</header>
+
+<main id="main">
+  <section class="panel gut" id="p-check">
+    <div><h2>Thinking of buying something?</h2><p class="hint fresh" style="margin-top:6px"></p></div>
+    <div class="seg" role="group" aria-label="What are you checking">
+      <button id="mode-prod" aria-pressed="true">Product or food</button>
+      <button id="mode-car" aria-pressed="false">Car or truck</button>
+    </div>
+    <div id="prod-form" style="display:flex;flex-direction:column;gap:10px">
+      <form class="field" id="qform">
+        <label class="sr" for="q">Product name, brand, model or barcode</label>
+        <input type="text" id="q" placeholder="Brand, product, model # or barcode" autocomplete="off">
+        <button class="btn icon-btn ghost" type="button" id="scan" aria-label="Scan a barcode" title="Scan a barcode">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 7V4h3M21 7V4h-3M3 17v3h3M21 17v3h-3M7 8v8M10 8v8M13 8v8M17 8v8"/></svg>
+        </button>
+        <button class="btn" type="submit">Check</button>
+      </form>
+      <input type="file" id="barcode-file" accept="image/*" hidden>
+      <button class="btn scan-cta" type="button" id="scan-cta">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 7V4h3M21 7V4h-3M3 17v3h3M21 17v3h-3M7 8v8M10 8v8M13 8v8M17 8v8"/></svg>
+        Scan a barcode in the store
+      </button>
+      <div class="examples" id="examples"></div>
+    </div>
+    <div id="car-form" hidden style="display:flex;flex-direction:column;gap:10px">
+      <div class="vrow">
+        <label class="sr" for="mk">Make</label><select id="mk"><option value="">Make</option></select>
+        <label class="sr" for="md">Model</label><select id="md" disabled><option value="">Model</option></select>
+        <label class="sr" for="yr">Year</label><select id="yr" disabled><option value="">Year</option></select>
+      </div>
+      <p class="hint">Recalls listed by make, model and year. Some may not apply to one specific car or may already be fixed.</p>
+    </div>
+    <div id="result" class="list" aria-live="polite"></div>
+  </section>
+
+  <section class="panel gut" id="p-mine" hidden>
+    <div class="head-row"><h2>My stuff</h2><button class="btn small ghost" id="share-list" type="button" hidden>Share my list</button></div>
+    <p class="sub">Add what you own. SIGI flags it when a recall matches and marks anything recalled after you added it.</p>
+    <div id="mine-list" class="list"></div>
+    <h3>Add something</h3>
+    <form class="field" id="addform">
+      <label class="sr" for="addq">Product you own</label>
+      <input type="text" id="addq" placeholder="e.g. Graco Milestone car seat" autocomplete="off">
+      <button class="btn" type="submit">Add</button>
+    </form>
+    <p class="hint">To add a vehicle, look it up under Check → Car or truck, then tap "I own this, watch it".</p>
+  </section>
+
+  <section class="panel gut" id="p-latest" hidden>
+    <div><h2>Latest recalls</h2><p class="hint fresh" style="margin-top:6px"></p></div>
+    <div class="examples" id="filters"></div>
+    <div id="latest" class="list"></div>
+    <button class="btn ghost" id="more" hidden>Show more</button>
+  </section>
+
+  <section class="panel gut" id="p-account" hidden>
+    <div class="me"><img id="me-av" alt=""><div style="min-width:0"><div class="nm" id="me-name"></div><div class="hint" id="me-mode"></div></div></div>
+    <div class="stats">
+      <div class="stat"><b id="st-watch">0</b>watching</div>
+      <div class="stat" id="st-flag-box"><b id="st-flag">0</b>flagged</div>
+      <div class="stat"><b id="st-checks">0</b>checks run</div>
+    </div>
+    <h3>Recent checks</h3>
+    <div class="rows" id="history"></div>
+    <h3>Appearance</h3>
+    <div class="seg" role="group" aria-label="Theme">
+      <button data-theme-set="system" aria-pressed="true">System</button>
+      <button data-theme-set="light" aria-pressed="false">Light</button>
+      <button data-theme-set="dark" aria-pressed="false">Dark</button>
+    </div>
+    <h3>Scanner</h3>
+    <div class="rows">
+      <div><label for="beep-pref">Beep when a barcode scans</label><span><input type="checkbox" class="switch" id="beep-pref" checked></span></div>
+      <div><label for="buzz-pref">Vibrate when a barcode scans</label><span><input type="checkbox" class="switch" id="buzz-pref" checked></span></div>
+    </div>
+    <h3>Recall data</h3>
+    <div class="rows">
+      <div><span>Updated</span><span id="d-asof">—</span></div>
+      <div><span>Products and food</span><span id="d-prod">—</span></div>
+      <div><span>Cars and trucks</span><span>Live from NHTSA on every check</span></div>
+      <div><span>Vehicles</span><span id="d-makes">—</span></div>
+      <div><span>Sources</span><span><a class="link" href="https://www.cpsc.gov/Recalls" target="_blank" rel="noopener">CPSC</a> · <a class="link" href="https://www.fda.gov/safety/recalls-market-withdrawals-safety-alerts" target="_blank" rel="noopener">FDA</a> · <a class="link" href="https://www.nhtsa.gov/recalls" target="_blank" rel="noopener">NHTSA</a></span></div>
+    </div>
+    <p class="note">SIGI matches your words against public recall notices. It can miss a recall or flag one that isn't yours, so always confirm the model or lot number on the official notice. Not affiliated with any government agency.</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn danger" id="clear-hist">Clear recent checks</button>
+      <button class="btn ghost" id="signout">Sign out</button>
+    </div>
+  </section>
+</main>
+
+<nav class="gut" role="tablist" aria-label="Sections">
+  <button class="tab" role="tab" aria-selected="true" data-p="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>Check</button>
+  <button class="tab" role="tab" aria-selected="false" data-p="mine"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5 12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/><path d="M9 21v-7h6v7"/></svg>My stuff<span class="badge" id="badge" hidden></span></button>
+  <button class="tab" role="tab" aria-selected="false" data-p="latest"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3M5.6 5.6l2.1 2.1M3 12h3M18.4 5.6l-2.1 2.1M21 12h-3"/><path d="M6 21a6 6 0 0 1 12 0z"/></svg>Latest</button>
+  <button class="tab" role="tab" aria-selected="false" data-p="account"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Account</button>
+</nav>
+</div>
+
+<!-- ============ LIVE SCANNER ============ -->
+<div id="scanner" class="scanner" role="dialog" aria-modal="true" aria-label="Barcode scanner" hidden>
+  <video id="scan-video" playsinline muted autoplay></video>
+  <div class="scan-frame" id="scan-frame" aria-hidden="true">
+    <i class="c tl"></i><i class="c tr"></i><i class="c bl"></i><i class="c br"></i>
+    <span class="laser"></span>
+  </div>
+  <div class="scan-top">
+    <button class="scan-btn" id="scan-close" aria-label="Close scanner">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+    <span class="scan-title">Scan a barcode</span>
+    <span class="scan-tools">
+      <button class="scan-btn" id="scan-torch" aria-label="Flashlight" aria-pressed="false" hidden>
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M7 2h10l-2 6v12a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2V8z"/><path d="M12 12v3"/></svg>
+      </button>
+      <button class="scan-btn" id="scan-beep" aria-label="Beep on scan" aria-pressed="true">
+        <svg class="on" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/></svg>
+        <svg class="off" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M17 9l5 6M22 9l-5 6"/></svg>
+      </button>
+    </span>
+  </div>
+  <div class="scan-bottom">
+    <p class="scan-msg" id="scan-msg" aria-live="polite">Line up the barcode inside the frame</p>
+    <div class="scan-actions">
+      <button class="scan-pill" id="scan-photo">Use a photo</button>
+      <button class="scan-pill" id="scan-type">Type the number</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script>
+/* SIGI · Should I Get It?  Front end.
+   Sign-in and saved lists: Supabase (config comes from /api/config).
+   "Ask Claude to compare": POST /api/compare on our own server. */
+(() => {
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmtDate = d => { try { return new Date(d+'T12:00:00').toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'}); } catch(e){ return d; } };
+const ago = iso => { const s=(Date.now()-new Date(iso))/1000; return s<90?'just now':s<3600?Math.round(s/60)+'m ago':s<86400?Math.round(s/3600)+'h ago':Math.round(s/86400)+'d ago'; };
+const SRC = {cpsc:'CPSC', fda:'FDA food', seat:'NHTSA seat', alert:'FDA alert', car:'NHTSA'};
+const SHARE_ICON = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5"/><path d="M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg>';
+const REC = new Map(); // every recall shown on screen, so its Share button can find it
+const since = iso => { const s = (Date.now() - new Date(iso)) / 1000; return isNaN(s) ? '' : s < 60 ? 'just now' : s < 3600 ? Math.round(s/60)+' min ago' : s < 86400 ? Math.round(s/3600)+' h ago' : Math.round(s/86400)+' days ago'; };
+const lsGet = (k, d) => { try { const v = localStorage.getItem(k); return v==null ? d : JSON.parse(v); } catch(e){ return d; } };
+const lsSet = (k, v) => { try { v==null ? localStorage.removeItem(k) : localStorage.setItem(k, JSON.stringify(v)); } catch(e){} };
+let DATA = null, IDX = null, IDF = {}, CONFIG = {}, sb = null;
+const vcache = {};
+let tt;
+function toast(msg){ let t=$('.toast'); if(!t){t=document.createElement('div');t.className='toast';t.setAttribute('role','status');document.body.appendChild(t);} t.textContent=msg; t.hidden=false; clearTimeout(tt); tt=setTimeout(()=>t.hidden=true,2600); }
+
+/* ================= theme ================= */
+function applyTheme(t){
+  if (t==='light'||t==='dark') document.documentElement.dataset.theme = t; else delete document.documentElement.dataset.theme;
+  $$('[data-theme-set]').forEach(b => b.setAttribute('aria-pressed', b.dataset.themeSet===(t||'system')));
+}
+applyTheme(lsGet('sigi-theme', 'system'));
+$$('[data-theme-set]').forEach(b => b.addEventListener('click', () => { lsSet('sigi-theme', b.dataset.themeSet); applyTheme(b.dataset.themeSet); }));
+
+/* ================= auth ================= */
+let ME = null; // {mode:'user'|'guest', id, email, name}
+function nameFromEmail(e){ const n = (e||'').split('@')[0].replace(/[._-]+/g,' ').trim(); return n ? n[0].toUpperCase()+n.slice(1) : 'You'; }
+async function enterAs(session){
+  ME = session
+    ? {mode:'user', id:session.user.id, email:session.user.email, name: session.user.user_metadata?.full_name || nameFromEmail(session.user.email)}
+    : {mode:'guest', name:'Guest'};
+  if (!session) lsSet('sigi-guest-mode', true);
+  $('#auth').hidden = true; $('#app').hidden = false;
+  $('#hello').innerHTML = 'Hi,<b></b>'; $('#hello b').textContent = ME.name.split(' ')[0];
+  $('#me-name').textContent = ME.mode==='user' ? ME.name : 'Guest';
+  $('#me-mode').textContent = ME.mode==='user' ? `${ME.email} · list syncs across devices` : 'Guest · list saved on this device only. Sign out, then sign in to sync it.';
+  $('#me-av').src = 'img/logo-mark.png';
+  const h = (location.hash||'').slice(1); show(['check','mine','latest','account'].includes(h) ? h : 'check');
+  await initStore();
+}
+function showAuth(){
+  ME = null; items = []; checks = []; statusCache = [];
+  $('#app').hidden = true; $('#auth').hidden = false; window.scrollTo(0,0);
+}
+$('#login-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  if (!sb){ toast('Sign-in isn’t set up on this server yet.'); return; }
+  const email = $('#email').value.trim(); if (!email) return;
+  $('#login-btn').disabled = true;
+  const { error } = await sb.auth.signInWithOtp({ email, options: { emailRedirectTo: location.origin } });
+  $('#login-btn').disabled = false;
+  if (error){ toast(error.message || 'Couldn’t send the link. Try again.'); return; }
+  $('#sent').hidden = false;
+  $('#sent').textContent = `Check ${email} for a sign-in link. Open it on this device to finish signing in.`;
+});
+$('#guest').addEventListener('click', () => enterAs(null));
+$('#signout').addEventListener('click', async () => {
+  lsSet('sigi-guest-mode', null);
+  if (ME?.mode==='user' && sb) await sb.auth.signOut().catch(()=>{});
+  showAuth();
+});
+
+/* ================= matching ================= */
+const STOP = new Set('the and for with of a an in on to by from inc llc co ltd recalls recall due risk recalled sold about this that are is be or as at its it brand model'.split(' '));
+function toks(s){ return (s||'').toLowerCase().replace(/[^a-z0-9]+/g,' ').split(' ').filter(w => w.length>1 && !STOP.has(w)); }
+function buildIndex(){
+  const df = {};
+  IDX = DATA.products.map(r => {
+    const title = r.title.replace(/\b(recalled )?due to\b.*$/i,'').replace(/;.*$/,'');
+    const set = new Set(toks([title,r.products,r.model,r.type].join(' ')));
+    const b = toks(r.src==='seat' ? r.products : title).filter(w=>!['child','seat'].includes(w));
+    const brand = new Set([...b.slice(0,3), toks(r.products)[0]].filter(Boolean));
+    set.forEach(w => df[w]=(df[w]||0)+1);
+    return {r, set, words:[...set], brand};
+  });
+  for (const w in df) IDF[w] = Math.log(1 + IDX.length/df[w]);
+}
+function search(q, n=6){
+  const digits = q.replace(/\D/g,'');
+  if (/^\d{8,14}$/.test(q.trim().replace(/\s/g,''))) {
+    const bare = digits.replace(/^0+/,'');
+    const hits = IDX.filter(x => (x.r.upc||[]).some(u => u.replace(/\D/g,'').replace(/^0+/,'') === bare));
+    return {upc:digits, hits: hits.map(x => ({r:x.r, cov:1, n:1, branded:true})), strong:[]};
+  }
+  const qt = [...new Set(toks(q))];
+  if (!qt.length) return {hits:[], strong:[], qt};
+  const wq = w => IDF[w] || Math.log(1+IDX.length);
+  const total = qt.reduce((a,w)=>a+wq(w),0);
+  const out = [];
+  for (const x of IDX){
+    let s=0, n=0;
+    for (const w of qt){
+      if (x.set.has(w)) { s+=wq(w); n++; continue; }
+      if (w.length>=4 && x.words.some(v => v.startsWith(w) || (v.length>=5 && w.startsWith(v)))) { s+=wq(w)*0.7; n++; }
+    }
+    if (n) out.push({r:x.r, cov:s/total, n, branded: qt.some(w => x.brand.has(w))});
+  }
+  out.sort((a,b)=> b.cov-a.cov || (b.r.date>a.r.date?1:-1));
+  const top = out[0]?.cov || 0;
+  return {hits: out.filter(h => h.cov >= Math.max(0.45, top*0.6)).slice(0,n), strong: out.filter(h=>h.cov>=0.8), qt};
+}
+function verdictFor(res){
+  const top = res.hits[0], qtLen = (res.qt||[]).length;
+  if (res.upc) return top ? 'skip' : 'none';
+  if (!top) return 'get';
+  if (top.cov < 0.5 || top.n < Math.min(2, qtLen)) return 'get';
+  if (top.cov >= 0.8 && top.branded && res.strong.filter(h=>h.branded).length < 3) return 'skip';
+  return 'check';
+}
+function bars(c){ const k = c>=.8?4:c>=.65?3:c>=.5?2:1; return '<span class="strength" title="Match strength">'+[1,2,3,4].map(i=>`<i class="${i<=k?'on':''}"></i>`).join('')+'</span>'; }
+
+/* ================= check: products ================= */
+function recallCard(r, extra=''){
+  REC.set(r.id, r);
+  const img = r.img ? `<img class="thumb" src="${esc(r.img)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">` : '';
+  const fresh = r.src==='alert' || (Date.now() - new Date(r.date+'T12:00:00')) < 3*86400000;
+  return `<article class="rc">
+    <div class="meta"><span class="pill">${SRC[r.src]||'Recall'}</span>${fresh?'<span class="pill new">New</span>':''}<span>${fmtDate(r.date)}</span>${r.units?`<span>${esc(r.units)} units</span>`:''}${extra}</div>
+    <div class="rc-main">${img}<div class="rc-text">
+      <div class="t">${esc(r.title)}</div>
+      ${r.hazard?`<div class="d"><b>${r.src==='alert'?'Details':'Hazard'}:</b> ${esc(r.hazard)}</div>`:''}
+      ${r.model?`<div class="d"><b>${r.src==='fda'?'Lot / codes':'Models'}:</b> ${esc(r.model)}</div>`:''}
+      ${r.remedy?`<div class="d"><b>What to do:</b> ${esc(r.remedy)}</div>`:''}
+    </div></div>
+    <div class="rc-foot">${r.url?`<a href="${esc(r.url)}" target="_blank" rel="noopener">Official notice ↗</a>`:'<span></span>'}<button class="share-btn" type="button" data-share="${esc(r.id)}">${SHARE_ICON}Share</button></div>
+  </article>`;
+}
+function recallShareText(r){
+  return [`⚠️ Recall: ${r.title}`, r.hazard && `${r.src==='alert'?'Details':'Hazard'}: ${r.hazard}`, r.remedy && `What to do: ${r.remedy}`, r.url, '', `Checked with SIGI · ${location.origin}`].filter(x => x!==undefined && x!=='' || x==='').join('\n').replace(/\n{3,}/g,'\n\n');
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-share]'); if (!b) return;
+  const r = REC.get(b.dataset.share); if (r) share(recallShareText(r), r.title);
+});
+const VERD = { get:['GET IT','get'], check:['CHECK IT','check'], skip:['SKIP IT','skip'], none:['NO MATCH','get'] };
+function tagHTML(v, why, actions=''){
+  const [w,c] = VERD[v];
+  return `<div class="tag ${c}"><div class="word">${w}</div><div class="why">${why}</div>${actions?`<div class="row">${actions}</div>`:''}</div>`;
+}
+let lastQuery = '', lastHits = [];
+function runCheck(q, {log=true}={}){
+  q = q.trim(); if (!q || !DATA) return;
+  const asCode = codeFromScan(q);
+  if (asCode && asCode === q.replace(/[\s-]/g,'')) { runScan(asCode, {log}); return; }
+  lastQuery = q;
+  const res = search(q); lastHits = res.hits;
+  const v = verdictFor(res);
+  let why;
+  if (res.upc) why = res.hits.length ? `Barcode ${esc(res.upc)} appears on a recall notice.` : `Barcode ${esc(res.upc)} isn't on any recall notice. Most notices don't list barcodes, so also search by brand and model.`;
+  else if (v==='skip') why = `A recall closely matches “${esc(q)}”. Compare the model numbers below before you buy.`;
+  else if (v==='check'){
+    const top = res.hits[0], brandHit = res.strong.filter(h=>h.branded).length;
+    if (brandHit >= 3) why = `${brandHit} different recalls match “${esc(q)}”. Find the model number on yours and compare it below.`;
+    else if (top.cov >= 0.8 && !top.branded) why = `${res.strong.length} recall${res.strong.length>1?'s':''} cover this kind of product, but your search doesn't name a recalled brand. Add the brand, or check if yours is one below.`;
+    else why = `Some recalls partly match “${esc(q)}”. They may be a different model, so look closely.`;
+  }
+  else why = `No recalls in the last two years match “${esc(q)}”. That covers CPSC products, FDA Class I food and NHTSA child seats.`;
+  const actions = [
+    res.hits.length && CONFIG.compareEnabled ? `<button class="btn small" id="ask">Ask Claude to compare</button>` : '',
+    `<button class="btn small ghost" id="watch-prod">I own this, watch it</button>`,
+    `<button class="btn small ghost" id="share">Share verdict</button>`].join('');
+  let html = tagHTML(v, why, actions) + `<div id="ai"></div>`;
+  let altCtx = null;
+  if (v==='skip' && res.hits[0]){
+    const top = res.hits[0].r, ix = IDX.find(x => x.r === top);
+    const brand = ix ? ix.brand : new Set();
+    let term = q.split(/\s+/).filter(w => !brand.has(w.toLowerCase().replace(/[^a-z0-9]/g,''))).join(' ').trim();
+    if (!term || /^\d+$/.test(term)) term = top.type || 'product';
+    altCtx = { name:q, term, hazard: top.hazard };
+    html += altSection(altCtx);
+  }
+  if (res.hits.length){
+    html += `<h3>${v==='get'?'Loosely related, probably not yours':res.hits.length===1?'Matching recall':'Closest recalls'}</h3>`;
+    html += res.hits.map(h => recallCard(h.r, bars(h.cov))).join('');
+  }
+  $('#result').innerHTML = html;
+  $('#ask')?.addEventListener('click', askClaude);
+  $('#watch-prod').addEventListener('click', () => addItem({kind:'product', label:q, q}));
+  if (altCtx) wireAlts(altCtx);
+  $('#share').addEventListener('click', () => share(`SIGI says ${VERD[v][0]} for “${q}”. ${res.hits[0]?'Closest recall: '+res.hits[0].r.title+' '+res.hits[0].r.url:'No matching recalls found.'}`));
+  if (log) logCheck({kind:'product', label:q, q, verdict:v});
+}
+async function share(text, title='SIGI'){
+  if (navigator.share){ try { await navigator.share({title, text}); return; } catch(e){ if (e?.name==='AbortError') return; } }
+  try { await navigator.clipboard.writeText(text); toast('Copied'); }
+  catch(e){ toast('Couldn’t copy. Long-press the text to copy it.'); }
+}
+
+/* Claude double-check, through our server */
+async function askClaude(){
+  const box = $('#ai'), btn = $('#ask');
+  if (ME?.mode!=='user'){ box.innerHTML = `<div class="ai">Sign in to use Ask Claude. It's free for you, and signing in stops strangers from using up the app's AI credit.</div>`; return; }
+  btn.disabled = true;
+  box.innerHTML = `<div class="ai"><span><span class="spinner"></span> Claude is comparing model details…</span></div>`;
+  const cands = lastHits.map(h => ({id:h.r.id, title:h.r.title, products:h.r.products, models_or_lots:h.r.model, type:h.r.type, date:h.r.date}));
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    const r = await fetch('/api/compare', { method:'POST', headers:{'content-type':'application/json', authorization:'Bearer '+(session?.access_token||'')}, body: JSON.stringify({query:lastQuery, candidates:cands}) });
+    const out = await r.json();
+    if (!r.ok) throw new Error(out.error || 'Claude couldn’t finish that check.');
+    const v = ['skip','check','get'].includes(out?.verdict) ? out.verdict : 'check';
+    const fit = Object.fromEntries((out?.matches||[]).map(m => [m.id, m]));
+    const label = {same:'Same product', maybe:'Maybe', different:'Different'};
+    box.innerHTML = `<div class="ai"><b>Claude's read: ${VERD[v][0]}</b><span>${esc(out?.summary||'')}</span>
+      ${lastHits.map(h => fit[h.r.id] ? `<span class="hint"><span class="pill ${fit[h.r.id].fit==='same'?'hot':fit[h.r.id].fit==='maybe'?'warn':'ok'}">${label[fit[h.r.id].fit]||'?'}</span> ${esc(h.r.title.slice(0,70))}${h.r.title.length>70?'…':''}: ${esc(fit[h.r.id].reason||'')}</span>`:'').join('')}
+      <span class="hint">Claude compared only the notices above. Confirm on the official notice.</span></div>`;
+  } catch(e){
+    box.innerHTML = `<div class="ai">${esc(e.message)}</div>`;
+  } finally { btn.disabled = false; }
+}
+
+/* ================= barcodes: live scanner, photo fallback, lookup ================= */
+const ZX_URL = 'https://cdn.jsdelivr.net/npm/@zxing/library@0.21.3/umd/index.min.js';
+let zxingLoad = null;
+const loadZXing = () => window.ZXing ? Promise.resolve() : (zxingLoad ||= new Promise((ok, bad) => { const s=document.createElement('script'); s.src=ZX_URL; s.onload=ok; s.onerror=() => { zxingLoad=null; bad(new Error('zxing')); }; document.head.appendChild(s); }));
+
+const digitsOf = s => String(s||'').replace(/\D/g,'');
+const gtinKey = s => digitsOf(s).replace(/^0+/,'');
+function gtinValid(d){
+  if (![8,12,13,14].includes(d.length)) return false;
+  const body = d.slice(0,-1), check = +d.slice(-1);
+  let t = 0; [...body].reverse().forEach((c,i) => t += (+c) * (i%2===0 ? 3 : 1));
+  return (10 - t%10) % 10 === check;
+}
+/* QR codes on packaging often carry a GS1 Digital Link: https://id.gs1.org/01/00012345678905 */
+function codeFromScan(text){
+  const t = String(text||'').trim();
+  const gs1 = t.match(/\/01\/(\d{8,14})(?:\/|\?|$)/); if (gs1) return gs1[1];
+  const d = digitsOf(t);
+  if (/^[\d\s-]+$/.test(t) && d.length>=8 && d.length<=14) return d;
+  return null;
+}
+
+/* ---- feedback: beep + vibrate ---- */
+const prefs = { beep: lsGet('sigi-beep', true), buzz: lsGet('sigi-buzz', true) };
+let audioCtx = null;
+function unlockAudio(){ try { audioCtx ||= new (window.AudioContext||window.webkitAudioContext)(); if (audioCtx.state==='suspended') audioCtx.resume(); } catch(e){} }
+function beep(){
+  if (!prefs.beep || !audioCtx) return;
+  try {
+    const t = audioCtx.currentTime, o = audioCtx.createOscillator(), g = audioCtx.createGain();
+    o.type = 'square'; o.frequency.setValueAtTime(2200, t);
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.18, t+0.01); g.gain.exponentialRampToValueAtTime(0.0001, t+0.14);
+    o.connect(g).connect(audioCtx.destination); o.start(t); o.stop(t+0.15);
+  } catch(e){}
+}
+function buzz(){ if (prefs.buzz && navigator.vibrate) try { navigator.vibrate(70); } catch(e){} }
+function syncPrefUI(){
+  $('#beep-pref').checked = prefs.beep; $('#buzz-pref').checked = prefs.buzz;
+  $('#scan-beep').setAttribute('aria-pressed', prefs.beep);
+  $('#scan-beep').setAttribute('aria-label', prefs.beep ? 'Beep is on. Tap to mute.' : 'Beep is off. Tap to turn on.');
+}
+$('#beep-pref').addEventListener('change', e => { prefs.beep = e.target.checked; lsSet('sigi-beep', prefs.beep); syncPrefUI(); if (prefs.beep){ unlockAudio(); beep(); } });
+$('#buzz-pref').addEventListener('change', e => { prefs.buzz = e.target.checked; lsSet('sigi-buzz', prefs.buzz); syncPrefUI(); });
+$('#scan-beep').addEventListener('click', () => { prefs.beep = !prefs.beep; lsSet('sigi-beep', prefs.beep); syncPrefUI(); if (prefs.beep){ unlockAudio(); beep(); } });
+syncPrefUI();
+
+/* ---- live scanner ---- */
+const SC = { stream:null, raf:0, reader:null, detector:null, last:null, hits:0, done:false, lostTimer:0, track:null };
+const video = $('#scan-video'), frame = $('#scan-frame');
+function frameHome(){
+  frame.classList.remove('tracking','locked');
+  const w = innerWidth, h = innerHeight, fw = Math.min(w*0.78, 420), fh = Math.min(fw*0.55, h*0.3);
+  Object.assign(frame.style, { left:(w-fw)/2+'px', top:(h-fh)/2-h*0.04+'px', width:fw+'px', height:fh+'px' });
+}
+/* map points from video pixels to screen pixels (video uses object-fit: cover) */
+function toScreen(pts){
+  const vw = video.videoWidth, vh = video.videoHeight; if (!vw || !vh) return null;
+  const sw = video.clientWidth, sh = video.clientHeight, k = Math.max(sw/vw, sh/vh);
+  const ox = (sw - vw*k)/2, oy = (sh - vh*k)/2;
+  return pts.map(p => ({x: p.x*k+ox, y: p.y*k+oy}));
+}
+function trackTo(pts){
+  const s = toScreen(pts); if (!s || !s.length) return;
+  let x0 = Math.min(...s.map(p=>p.x)), x1 = Math.max(...s.map(p=>p.x)), y0 = Math.min(...s.map(p=>p.y)), y1 = Math.max(...s.map(p=>p.y));
+  // 1-D barcodes give a thin line of points; give the box some height
+  const minH = Math.max(60, (x1-x0)*0.45);
+  if (y1-y0 < minH){ const cy=(y0+y1)/2; y0=cy-minH/2; y1=cy+minH/2; }
+  const pad = 18, m = 10, W = innerWidth, H = innerHeight;
+  x0 = Math.max(m, x0-pad); y0 = Math.max(m+60, y0-pad); x1 = Math.min(W-m, x1+pad); y1 = Math.min(H-m-120, y1+pad);
+  if (x1-x0 < 80 || y1-y0 < 50) return;
+  Object.assign(frame.style, { left:x0+'px', top:y0+'px', width:(x1-x0)+'px', height:(y1-y0)+'px' });
+  frame.classList.add('tracking');
+  clearTimeout(SC.lostTimer); SC.lostTimer = setTimeout(() => { if (!SC.done){ frameHome(); SC.last=null; SC.hits=0; } }, 900);
+}
+function onCandidate(text, pts){
+  if (SC.done) return;
+  const code = codeFromScan(text);
+  if (pts?.length) trackTo(pts);
+  // need the same reading twice in a row so a blurry frame can't give a wrong number
+  if (text === SC.last) SC.hits++; else { SC.last = text; SC.hits = 1; }
+  const valid = code ? (code.length===8 || gtinValid(code)) : true;
+  if (!valid) return;
+  if (SC.hits < 2) { $('#scan-msg').textContent = 'Hold steady…'; return; }
+  SC.done = true;
+  frame.classList.remove('tracking'); frame.classList.add('locked');
+  beep(); buzz();
+  $('#scan-msg').textContent = code ? `Got it: ${code}` : 'Got it';
+  setTimeout(() => { closeScanner(); handleScan(text); }, 380);
+}
+async function openScanner(){
+  unlockAudio();
+  if (!navigator.mediaDevices?.getUserMedia){ toast('This browser can’t open the camera. Use a photo instead.'); $('#barcode-file').click(); return; }
+  Object.assign(SC, { done:false, last:null, hits:0 });
+  $('#scanner').hidden = false; document.body.style.overflow = 'hidden';
+  frameHome(); $('#scan-msg').textContent = 'Starting camera…';
+  try {
+    SC.stream = await navigator.mediaDevices.getUserMedia({ audio:false, video:{ facingMode:{ideal:'environment'}, width:{ideal:1920}, height:{ideal:1080} } });
+  } catch(e){
+    $('#scan-msg').textContent = e?.name==='NotAllowedError'
+      ? 'Camera access is blocked. Allow the camera for this site in your browser settings, or use a photo.'
+      : 'Couldn’t start the camera. Use a photo or type the number instead.';
+    return;
+  }
+  if ($('#scanner').hidden){ stopStream(); return; }   // closed while asking for permission
+  video.srcObject = SC.stream;
+  try { await video.play(); } catch(e){}
+  SC.track = SC.stream.getVideoTracks()[0];
+  try { // continuous focus and flashlight where the phone supports them
+    const caps = SC.track.getCapabilities?.() || {};
+    if (caps.focusMode?.includes('continuous')) SC.track.applyConstraints({ advanced:[{ focusMode:'continuous' }] }).catch(()=>{});
+    $('#scan-torch').hidden = !caps.torch; $('#scan-torch').setAttribute('aria-pressed','false');
+  } catch(e){}
+  $('#scan-msg').textContent = 'Line up the barcode inside the frame';
+  startDecoding();
+}
+async function startDecoding(){
+  const fmts = ['ean_13','ean_8','upc_a','upc_e','code_128','qr_code'];
+  if ('BarcodeDetector' in window){
+    try {
+      const ok = await BarcodeDetector.getSupportedFormats();
+      if (ok.includes('ean_13')){
+        SC.detector = new BarcodeDetector({ formats: fmts.filter(f => ok.includes(f)) });
+        let busy = false, lastT = 0;
+        const loop = async t => {
+          if (SC.done || !SC.stream) return;
+          SC.raf = requestAnimationFrame(loop);
+          if (busy || t - lastT < 90 || video.readyState < 2) return;
+          busy = true; lastT = t;
+          try {
+            const found = await SC.detector.detect(video);
+            if (found[0]) onCandidate(found[0].rawValue, found[0].cornerPoints);
+          } catch(e){}
+          busy = false;
+        };
+        SC.raf = requestAnimationFrame(loop);
+        return;
+      }
+    } catch(e){}
+  }
+  try { await loadZXing(); }
+  catch(e){ $('#scan-msg').textContent = 'Couldn’t load the scanner. Check your connection, or type the number.'; return; }
+  if (SC.done || !SC.stream) return;
+  const Z = window.ZXing, hints = new Map();
+  hints.set(Z.DecodeHintType.POSSIBLE_FORMATS, [Z.BarcodeFormat.EAN_13, Z.BarcodeFormat.EAN_8, Z.BarcodeFormat.UPC_A, Z.BarcodeFormat.UPC_E, Z.BarcodeFormat.CODE_128, Z.BarcodeFormat.QR_CODE]);
+  hints.set(Z.DecodeHintType.TRY_HARDER, true);
+  SC.reader = new Z.BrowserMultiFormatReader(hints, 120);
+  const canvas = document.createElement('canvas'), ctx = canvas.getContext('2d', { willReadFrequently:true });
+  const tick = () => {
+    if (SC.done || !SC.stream) return;
+    if (video.readyState >= 2 && video.videoWidth){
+      canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+      ctx.drawImage(video, 0, 0);
+      try {
+        const lum = new Z.HTMLCanvasElementLuminanceSource(canvas);
+        const res = SC.reader.decodeBitmap(new Z.BinaryBitmap(new Z.HybridBinarizer(lum)));
+        onCandidate(res.getText(), (res.getResultPoints()||[]).map(p => ({x:p.getX(), y:p.getY()})));
+      } catch(e){ /* nothing in this frame */ }
+    }
+    SC.raf = setTimeout(tick, 110);
+  };
+  tick();
+}
+function stopStream(){
+  cancelAnimationFrame(SC.raf); clearTimeout(SC.raf); clearTimeout(SC.lostTimer);
+  try { SC.reader?.reset(); } catch(e){}
+  SC.stream?.getTracks().forEach(t => t.stop());
+  SC.stream = null; SC.reader = null; SC.track = null; video.srcObject = null;
+}
+function closeScanner(){
+  stopStream();
+  $('#scanner').hidden = true; document.body.style.overflow = '';
+}
+$('#scan').addEventListener('click', openScanner);
+$('#scan-cta').addEventListener('click', openScanner);
+$('#scan-close').addEventListener('click', closeScanner);
+$('#scan-type').addEventListener('click', () => { closeScanner(); $('#q').value=''; $('#q').placeholder='Type the numbers under the barcode'; $('#q').focus(); });
+$('#scan-photo').addEventListener('click', () => { closeScanner(); $('#barcode-file').click(); });
+$('#scan-torch').addEventListener('click', async e => {
+  const on = e.currentTarget.getAttribute('aria-pressed') !== 'true';
+  try { await SC.track.applyConstraints({ advanced:[{ torch:on }] }); e.currentTarget.setAttribute('aria-pressed', on); } catch(err){ toast('Flashlight isn’t available.'); }
+});
+document.addEventListener('keydown', e => { if (e.key==='Escape' && !$('#scanner').hidden) closeScanner(); });
+document.addEventListener('visibilitychange', () => { if (document.hidden && !$('#scanner').hidden) closeScanner(); });
+addEventListener('resize', () => { if (!$('#scanner').hidden && !frame.classList.contains('tracking')) frameHome(); });
+
+/* photo fallback */
+$('#barcode-file').addEventListener('change', async e => {
+  const f = e.target.files[0]; e.target.value=''; if (!f) return;
+  toast('Reading barcode…');
+  try {
+    await loadZXing();
+    const url = URL.createObjectURL(f);
+    const r = await new ZXing.BrowserMultiFormatReader().decodeFromImageUrl(url);
+    URL.revokeObjectURL(url);
+    handleScan(r.getText());
+  } catch(err){ toast('No barcode found. Try a closer, sharper photo.'); }
+});
+
+/* ---- what a scan does ---- */
+function handleScan(text){
+  show('check'); setMode('prod');
+  const code = codeFromScan(text);
+  if (code){ $('#q').value = code; runScan(code); return; }
+  if (/^https?:\/\//i.test(text)){
+    $('#result').innerHTML = tagHTML('none', `That QR code is a web link, not a product barcode: <span style="overflow-wrap:anywhere">${esc(text.slice(0,120))}</span>. Scan the barcode with numbers under it instead.`);
+    return;
+  }
+  $('#q').value = text; runCheck(text);
+}
+function scannedHeader(code, product){
+  const icon = '<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 7V4h3M21 7V4h-3M3 17v3h3M21 17v3h-3M7 8v8M10 8v8M13 8v8M17 8v8"/></svg>';
+  const name = product ? [product.brand, product.name].filter(Boolean).join(' · ') : 'Unknown product';
+  const pic = product?.image ? `<img class="pimg" src="${esc(product.image)}" alt="${esc(name)}" referrerpolicy="no-referrer" onerror="this.outerHTML='${icon.replace(/"/g,'&quot;')}'">` : icon;
+  return `<div class="scanned">${pic}<div style="min-width:0"><div class="t">${esc(name)}</div><div class="s">Barcode ${esc(code)}${product?.category?' · '+esc(product.category):''}</div></div></div>`;
+}
+/* match a looked-up product against recall notices: brand must match, then the name */
+function productSearch(product){
+  const brandToks = toks(product.brand).filter(w => w.length > 1);
+  const nameToks = [...new Set(toks(product.name))].filter(w => !brandToks.includes(w))
+    .sort((a,b) => (IDF[b]||0) - (IDF[a]||0)).slice(0,6);
+  if (!nameToks.length) return [];
+  const total = nameToks.reduce((a,w) => a + (IDF[w]||1), 0);
+  const out = [];
+  for (const x of IDX){
+    if (brandToks.length && !brandToks.every(b => x.set.has(b) || x.words.some(v => v.startsWith(b) && b.length >= 4))) continue;
+    let s = 0;
+    for (const w of nameToks){
+      if (x.set.has(w)) s += IDF[w]||1;
+      else if (w.length >= 4 && x.words.some(v => v.startsWith(w) || (v.length >= 5 && w.startsWith(v)))) s += (IDF[w]||1)*0.7;
+    }
+    const cov = s/total;
+    if (cov >= 0.3) out.push({ r:x.r, cov, n:1, branded:true });
+  }
+  return out.sort((a,b) => b.cov-a.cov).slice(0,6);
+}
+let scanSeq = 0;
+async function runScan(code, {log=true}={}){
+  if (!DATA) return;
+  const seq = ++scanSeq, key = gtinKey(code);
+  lastQuery = code;
+  // 1) the exact barcode printed on a recall notice we already have
+  const exact = IDX.filter(x => (x.r.upc||[]).some(u => gtinKey(u) === key)).map(x => ({ r:x.r, cov:1, n:1, branded:true }));
+  $('#result').innerHTML = scannedHeader(code, null).replace('Unknown product', 'Looking up this product…') + `<div class="loading"><span class="spinner"></span></div>`;
+  // 2) ask our server: product name + any FDA notice that prints this barcode
+  let info = null;
+  try { const r = await fetch('/api/product/'+encodeURIComponent(code)); if (r.ok) info = await r.json(); } catch(e){}
+  if (seq !== scanSeq) return;
+  const product = info?.product || null;
+  const seen = new Set(exact.map(h => h.r.id));
+  for (const r of (info?.fda || [])) if (!seen.has(r.id)) { exact.push({ r, cov:1, n:1, branded:true }); seen.add(r.id); }
+  // 3) recalls from the same brand with a similar name
+  const related = product ? productSearch(product).filter(h => !seen.has(h.r.id)) : [];
+  const strong = related.filter(h => h.cov >= 0.6);
+
+  let v, why;
+  const pname = product ? esc([product.brand, product.name].filter(Boolean).join(' ')) : 'this product';
+  if (exact.length){ v = 'skip'; why = `This exact barcode is listed on ${exact.length>1 ? exact.length+' recall notices' : 'a recall notice'}. Check the lot code or dates on the package against the notice below.`; }
+  else if (strong.length){ v = 'check'; why = `No recall lists this barcode, but ${strong.length>1?strong.length+' recalls':'a recall'} from ${esc(product.brand||'this brand')} closely match${strong.length>1?'':'es'} the name. Compare the size, model or lot code below.`; }
+  else if (product){ v = 'get'; why = `No recalls found for ${pname}. We checked the barcode and the brand against CPSC products, FDA food and NHTSA child seats.`; }
+  else { v = 'none'; why = `We couldn't identify barcode ${esc(code)}, and it isn't on any recall notice. Type the brand and product name to search by name.`; }
+
+  lastHits = [...exact, ...related];
+  const actions = [
+    lastHits.length && CONFIG.compareEnabled ? `<button class="btn small" id="ask">Ask Claude to compare</button>` : '',
+    product ? `<button class="btn small ghost" id="watch-prod">I own this, watch it</button>` : `<button class="btn small ghost" id="type-name">Search by name</button>`,
+    `<button class="btn small ghost" id="share">Share verdict</button>`,
+    `<button class="btn small ghost" id="scan-again">Scan another</button>`].join('');
+  const shown = product || (exact[0] ? { name: exact[0].r.products.split(/[;,(]/)[0].slice(0,90), brand:'', category:'from the recall notice', image: exact[0].r.img } : null);
+  let altCtx = null;
+  if (v==='skip'){
+    const nm = shown ? [shown.brand, shown.name].filter(Boolean).join(' ') : code;
+    let term = product?.category || (product ? toks(product.name).filter(w => !toks(product.brand).includes(w)).slice(0,4).join(' ') : '') || exact[0]?.r.type || '';
+    if (!term || term==='Food') term = (shown?.name || '').split(/[;,(]/)[0].split(' ').slice(0,4).join(' ') || 'product';
+    altCtx = { name:nm, term, hazard: exact[0]?.r.hazard || '' };
+  }
+  let html = scannedHeader(code, shown) + tagHTML(v, why, actions) + (altCtx ? altSection(altCtx) : '') + `<div id="ai"></div>`;
+  if (exact.length) html += `<h3>Recall notice${exact.length>1?'s':''} listing this barcode</h3>` + exact.map(h => recallCard(h.r)).join('');
+  if (related.length) html += `<h3>${exact.length ? 'Other recalls from this brand' : strong.length ? 'Similar recalls from this brand' : 'Same brand, probably a different product'}</h3>` + related.map(h => recallCard(h.r, bars(h.cov))).join('');
+  if (!product && !exact.length) html += `<p class="hint">Barcode lookups come from Open Food Facts, Open Products Facts and UPCitemdb. Store brands and new items are often missing.</p>`;
+  $('#result').innerHTML = html;
+  if (product) lastQuery = [product.brand, product.name].filter(Boolean).join(' ');
+  $('#ask')?.addEventListener('click', askClaude);
+  $('#watch-prod')?.addEventListener('click', () => addItem({ kind:'product', label: [product.brand, product.name].filter(Boolean).join(' ').slice(0,120), q: [product.brand, product.name].filter(Boolean).join(' ').slice(0,200) }));
+  $('#type-name')?.addEventListener('click', () => { $('#q').value=''; $('#q').placeholder='Brand and product name'; $('#q').focus(); });
+  $('#scan-again').addEventListener('click', openScanner);
+  if (altCtx) wireAlts(altCtx);
+  $('#share').addEventListener('click', () => share(`SIGI says ${VERD[v][0]} for ${product ? [product.brand, product.name].filter(Boolean).join(' ') : 'barcode '+code}. ${exact[0] ? 'Recall: '+exact[0].r.title+' '+exact[0].r.url : ''}`.trim()));
+  if (log) logCheck({ kind:'product', label: (product ? [product.brand, product.name].filter(Boolean).join(' ') : 'Barcode '+code).slice(0,120), q: code, verdict: v });
+}
+
+/* ================= safer alternatives (Amazon affiliate) ================= */
+const amazonUrl = term => `https://www.amazon.com/s?k=${encodeURIComponent(term)}${CONFIG.amazonTag ? '&tag='+encodeURIComponent(CONFIG.amazonTag) : ''}`;
+const AMZ = 'rel="sponsored nofollow noopener" target="_blank"';
+function altSection(ctx){
+  return `<section class="alts" id="alts">
+    <div class="alts-head"><h3>Safer alternatives</h3>${CONFIG.amazonTag?'<span class="ad">Affiliate links</span>':''}</div>
+    <a class="alt-cta" href="${amazonUrl(ctx.term)}" ${AMZ}>
+      <span><b>Shop other ${esc(ctx.term.toLowerCase())} brands</b><small>See what else is available on Amazon</small></span><span aria-hidden="true">↗</span></a>
+    ${CONFIG.aiEnabled ? `<button class="btn small ghost" id="alt-ai" type="button">✨ Suggest specific safer picks</button>` : ''}
+    <div id="alt-list" class="list"></div>
+    <p class="fine-l">Always check the model you buy with SIGI before checkout.${CONFIG.amazonTag ? ' As an Amazon Associate, SIGI earns from qualifying purchases.' : ''}</p>
+  </section>`;
+}
+function wireAlts(ctx){
+  const btn = $('#alt-ai'); if (!btn) return;
+  btn.addEventListener('click', async () => {
+    const box = $('#alt-list');
+    if (ME?.mode!=='user' || !sb){ box.innerHTML = `<div class="ai">Sign in to get specific picks from Claude. The Amazon link above works for everyone.</div>`; return; }
+    btn.disabled = true;
+    box.innerHTML = `<div class="ai"><span><span class="spinner"></span> Finding safer picks and checking each one for recalls…</span></div>`;
+    try {
+      const { data: { session } } = await sb.auth.getSession();
+      const prompt = `A US shopper wanted "${ctx.name}" but it is under a safety recall${ctx.hazard ? ` (${ctx.hazard})` : ''}. Suggest 4 widely sold alternatives in the same category ("${ctx.term}") from other brands, available on Amazon in the US. Prefer established brands with good safety records. Do not suggest the recalled brand.
+Return {"items":[{"name":"Brand and model, as you would search for it on Amazon","why":"one short sentence on why it's a good pick"}]}`;
+      const r = await fetch('/api/ai', { method:'POST', headers:{'content-type':'application/json', authorization:'Bearer '+(session?.access_token||'')}, body: JSON.stringify({ prompt }) });
+      const out = await r.json();
+      if (!r.ok) throw new Error(out.error || 'Claude couldn’t finish that.');
+      const picks = (out.items || []).filter(x => x?.name).slice(0,4).map(x => ({ ...x, v: verdictFor(search(x.name)) }));
+      const clean = picks.filter(x => x.v === 'get');
+      box.innerHTML = clean.length ? clean.map(x => `
+        <a class="alt-pick" href="${amazonUrl(x.name)}" ${AMZ}>
+          <span class="alt-ok" aria-hidden="true">✓</span>
+          <span style="min-width:0"><b>${esc(x.name)}</b><small>${esc(x.why||'')}</small><small class="ok-note">No recalls in SIGI's data</small></span>
+          <span aria-hidden="true">↗</span></a>`).join('')
+        : `<div class="ai">Every pick Claude suggested had a possible recall, so SIGI is hiding them. Use the Amazon link above and check your choice before you buy.</div>`;
+      if (clean.length < picks.length) box.insertAdjacentHTML('beforeend', `<p class="fine-l">${picks.length-clean.length} suggestion${picks.length-clean.length>1?'s were':' was'} hidden because ${picks.length-clean.length>1?'they':'it'} matched a recall.</p>`);
+      btn.hidden = true;
+    } catch(e){ box.innerHTML = `<div class="ai">${esc(e.message)}</div>`; btn.disabled = false; }
+  });
+}
+
+/* ================= check: vehicles ================= */
+const titleCase = s => s.replace(/\b([A-Z])([A-Z]+)\b/g,(m,a,b)=>a+b.toLowerCase());
+function opt(sel, list, ph){ sel.innerHTML = `<option value="">${ph}</option>` + list.map(x=>`<option>${esc(x)}</option>`).join(''); }
+$('#mk').addEventListener('change', () => {
+  const m = $('#mk').value; $('#yr').disabled = true; opt($('#yr'),[], 'Year');
+  if (!m){ $('#md').disabled = true; return; }
+  opt($('#md'), Object.keys(DATA.makes[m].m).sort(), 'Model'); $('#md').disabled = false;
+});
+$('#md').addEventListener('change', () => {
+  const m=$('#mk').value, md=$('#md').value; if(!md) return;
+  opt($('#yr'), DATA.makes[m].m[md].slice().sort().reverse(), 'Year'); $('#yr').disabled=false;
+});
+$('#yr').addEventListener('change', () => { if ($('#yr').value) runCar($('#mk').value, $('#md').value, $('#yr').value); });
+function pickCar(mk, md, yr){
+  setMode('car'); $('#mk').value=mk; $('#mk').dispatchEvent(new Event('change'));
+  $('#md').value=md; $('#md').dispatchEvent(new Event('change')); $('#yr').value=yr;
+}
+function loadMake(mk){
+  const f = DATA.makes[mk]?.f; if (!f) return Promise.resolve(null);
+  return vcache[f] ||= fetch(`data/v/${f}.json`).then(r=>{ if(!r.ok) throw 0; return r.json(); }).catch(()=>{ delete vcache[f]; return null; });
+}
+const carLive = new Map(); // "MAKE|MODEL|YEAR" -> { at, list }
+async function carRecalls(mk, md, yr){
+  const key = `${mk}|${md}|${yr}`, hit = carLive.get(key);
+  if (hit && Date.now() - hit.at < 15*60000) return hit.list;
+  try { // live from NHTSA through our server
+    const r = await fetch(`/api/vehicle?make=${encodeURIComponent(mk)}&model=${encodeURIComponent(md)}&year=${encodeURIComponent(yr)}`);
+    if (r.ok){
+      const d = await r.json();
+      const list = d.recalls.sort((a,b)=> a.d<b.d?1:-1); list.live = true; list.at = d.at;
+      carLive.set(key, { at: Date.now(), list });
+      return list;
+    }
+  } catch(e){}
+  const d = await loadMake(mk); if (!d) return [];   // saved weekly copy if NHTSA is down
+  return (d.models?.[md]?.[yr] || []).map(id => ({id, ...d.campaigns[id]})).sort((a,b)=> a.d<b.d?1:-1);
+}
+function campCard(c, label=''){
+  const rec = { id:'V'+c.id, src:'car', date:c.d, title:`${label ? label+': ' : ''}${c.c} recall (NHTSA ${c.id})`, hazard:c.q || c.s, remedy:c.r, url:`https://www.nhtsa.gov/recalls?nhtsaId=${c.id}` };
+  REC.set(rec.id, rec);
+  const fresh = (Date.now() - new Date(c.d+'T12:00:00')) < 30*86400000;
+  return `<article class="rc"><div class="meta"><span class="pill">NHTSA ${esc(c.id)}</span>${fresh?'<span class="pill new">New</span>':''}<span>${fmtDate(c.d)}</span>${c.n?'<span class="pill hot">Do not drive</span>':''}${c.o?'<span class="pill warn">Park outside</span>':''}${c.ota?'<span class="pill">Fix over the air</span>':''}</div>
+    <div class="t">${esc(c.c)}</div><div class="d">${esc(c.s)}</div>
+    ${c.q?`<div class="d"><b>Risk:</b> ${esc(c.q)}</div>`:''}${c.r?`<div class="d"><b>Fix:</b> ${esc(c.r)}</div>`:''}
+    <div class="rc-foot"><a href="https://www.nhtsa.gov/recalls?nhtsaId=${esc(c.id)}" target="_blank" rel="noopener">NHTSA notice ↗</a><button class="share-btn" type="button" data-share="${esc(rec.id)}">${SHARE_ICON}Share</button></div></article>`;
+}
+async function runCar(mk, md, yr, {log=true}={}){
+  $('#result').innerHTML = `<div class="loading"><span class="spinner"></span></div>`;
+  const list = await carRecalls(mk, md, yr);
+  const label = titleCase(`${yr} ${mk} ${md}`);
+  const severe = list.filter(c=>c.n||c.o).length;
+  const recent = list.filter(c=> c.d >= `${new Date().getFullYear()-1}-01-01`).length;
+  const v = severe ? 'skip' : list.length ? 'check' : 'get';
+  const why = !list.length ? `No safety recalls on file for the ${esc(label)}.`
+    : `${list.length} recall${list.length>1?'s':''} on the ${esc(label)}${severe?`, including ${severe} with a do-not-drive or park-outside warning`:''}${recent?`. ${recent} issued since last January`:''}. Ask the seller for proof each one was fixed, or run the VIN.`;
+  const actions = `<a class="btn small" href="https://www.nhtsa.gov/recalls" target="_blank" rel="noopener">Check the exact VIN ↗</a><button class="btn small ghost" id="watch-car">I own this, watch it</button>`;
+  const src = list.live ? `<p class="hint fresh-line"><span class="live-dot"></span>Live from NHTSA · checked ${since(list.at)}</p>` : `<p class="hint">NHTSA didn't answer, so this is SIGI's saved copy from ${fmtDate(DATA.asOf.slice(0,10))}.</p>`;
+  $('#result').innerHTML = tagHTML(v, why, actions) + src + (list.length?`<h3>Recalls, newest first</h3>`:'') + list.map(c => campCard(c, label)).join('');
+  $('#watch-car').addEventListener('click', () => addItem({kind:'car', label, make:mk, model:md, year:yr}));
+  if (log) logCheck({kind:'car', label, make:mk, model:md, year:yr, verdict:v});
+}
+
+/* ================= storage: Supabase when signed in, this browser for guests ================= */
+let items = [], checks = [], store = null;
+const ITEM_COLS = 'id,kind,label,q,make,model,year,added';
+const CHECK_COLS = 'id,kind,label,q,make,model,year,verdict,at';
+function guestData(){ return lsGet('sigi-guest', {items:[], checks:[]}); }
+async function initStore(){
+  store = null;
+  if (ME.mode==='user' && sb){
+    const reload = async () => {
+      const [a, b] = await Promise.all([
+        sb.from('watch_items').select(ITEM_COLS).order('created_at', {ascending:false}),
+        sb.from('checks').select(CHECK_COLS).order('at', {ascending:false}).limit(30)]);
+      if (a.error || b.error){ toast('Couldn’t load your saved list. Check your connection.'); return; }
+      items = a.data; checks = b.data; renderMine(); renderAccount();
+    };
+    store = {
+      reload,
+      add: async it => { const t = it.list==='history' ? 'checks' : 'watch_items'; const {list, ...row} = it; const { error } = await sb.from(t).insert(row); if (error) throw error; await reload(); },
+      del: async (id, list) => { const { error } = await sb.from(list==='history'?'checks':'watch_items').delete().eq('id', id); if (error) throw error; await reload(); },
+      clearChecks: async () => { await sb.from('checks').delete().eq('user_id', ME.id); await reload(); },
+    };
+    // move a guest list on this device into the account
+    const g = guestData();
+    if (g.items.length || g.checks.length){
+      for (const it of g.items) await sb.from('watch_items').insert({kind:it.kind,label:it.label,q:it.q,make:it.make,model:it.model,year:it.year,added:it.added}).then(()=>{});
+      lsSet('sigi-guest', null); toast('Moved your guest list into your account');
+    }
+    await reload();
+    return;
+  }
+  const g = guestData(); items = g.items; checks = g.checks;
+  const save = () => lsSet('sigi-guest', {items, checks});
+  store = {
+    reload: async () => {},
+    add: async it => { (it.list==='history'?checks:items).unshift(it); save(); renderMine(); renderAccount(); },
+    del: async id => { items = items.filter(x=>x.id!==id); checks = checks.filter(x=>x.id!==id); save(); renderMine(); renderAccount(); },
+    clearChecks: async () => { checks = []; save(); renderAccount(); },
+  };
+  renderMine(); renderAccount();
+}
+document.addEventListener('visibilitychange', () => { if (!document.hidden) store?.reload(); });
+const newId = () => (crypto.randomUUID ? crypto.randomUUID() : 'g'+Date.now().toString(36)+Math.random().toString(36).slice(2));
+async function addItem(it){
+  if (!store){ toast('Still loading. Try again in a second.'); return; }
+  if (items.some(x => x.label.toLowerCase()===it.label.toLowerCase())) { toast('Already in My stuff'); return; }
+  Object.assign(it, {added:new Date().toISOString().slice(0,10)});
+  if (ME.mode!=='user') it.id = newId();
+  try { await store.add(it); toast('Added to My stuff'); } catch(e){ toast('Couldn’t save that. Try again.'); }
+}
+async function logCheck(h){
+  if (!store) return;
+  h.list = 'history';
+  if (ME.mode==='user'){ sb.from('checks').delete().eq('label', h.label).then(() => store.add(h)).catch(()=>{}); return; }
+  checks = checks.filter(x => x.label.toLowerCase()!==h.label.toLowerCase()).slice(0,29);
+  Object.assign(h, {id:newId(), at:new Date().toISOString()});
+  store.add(h);
+}
+
+/* ================= my stuff ================= */
+let statusCache = [], renderSeq = 0, mineShare = null;
+$('#share-list').addEventListener('click', () => {
+  if (!mineShare) return;
+  const rows = mineShare.snapshot.map((it,i) => ({ it, s: mineShare.st[i] })).sort((a,b) => ({skip:0,check:1,get:2}[a.s.v]??2) - ({skip:0,check:1,get:2}[b.s.v]??2));
+  const flagged = rows.filter(x => x.s.v !== 'get').length;
+  const lines = rows.map(({it, s}) => `${s.v==='skip'?'🔴':s.v==='check'?'🟠':'🟢'} ${it.label}: ${s.text}${s.top?.url ? '\n   '+s.top.url : ''}`);
+  share([`My SIGI recall check: ${flagged} of ${rows.length} item${rows.length>1?'s':''} flagged`, '', ...lines, '', `Check yours with SIGI · ${location.origin}`].join('\n'), 'My recall list');
+});
+async function itemStatus(it){
+  if (it.kind==='car'){
+    const list = await carRecalls(it.make, it.model, it.year);
+    const fresh = list.filter(c=>c.d>=it.added).length;
+    return {v: list.some(c=>c.n||c.o)?'skip':list.length?'check':'get',
+      text: list.length ? `${list.length} recall${list.length>1?'s':''}${fresh?` · ${fresh} new since added`:''}` : 'No recalls on file',
+      top: list[0] ? { title: `${list[0].c} (NHTSA ${list[0].id})`, url: `https://www.nhtsa.gov/recalls?nhtsaId=${list[0].id}` } : null};
+  }
+  const res = search(it.q || it.label, 4); let v = verdictFor(res); if (v==='none') v='get';
+  const fresh = v!=='get' ? res.hits.filter(h=>h.r.date>=it.added && h.cov>=.5).length : 0;
+  return {v, text: (v==='skip'?'Recall matches':v==='check'?'Possible recall, check the model':'No recalls found') + (fresh?` · ${fresh} new since added`:''),
+    top: v!=='get' && res.hits[0] ? { title: res.hits[0].r.title, url: res.hits[0].r.url } : null};
+}
+async function renderMine(){
+  const el = $('#mine-list');
+  if (!DATA) return;
+  const seq = ++renderSeq;
+  if (!items.length){ $('#share-list').hidden = true; el.innerHTML = `<div class="empty">Nothing here yet. Add your kids' car seat, your car, the space heater. Anything you'd want to hear about.</div>`; $('#badge').hidden=true; statusCache=[]; renderAccount(); return; }
+  const snapshot = items.slice();
+  const st = await Promise.all(snapshot.map(itemStatus));
+  if (seq !== renderSeq) return;
+  statusCache = st;
+  const alerts = st.filter(s=>s.v!=='get').length;
+  el.innerHTML = snapshot.map((it,i) => `
+    <div class="item" tabindex="0" data-i="${i}"><span class="dot ${st[i].v}"></span>
+      <div style="min-width:0"><div class="n">${esc(it.label)}</div><div class="s">${it.kind==='car'?'Vehicle · ':''}${esc(st[i].text)}</div></div>
+      <span class="item-btns"><button class="x" data-ishare="${i}" aria-label="Share ${esc(it.label)}">${SHARE_ICON}</button><button class="x" data-del="${esc(it.id)}" aria-label="Remove ${esc(it.label)}">×</button></span></div>`).join('');
+  $('#share-list').hidden = false;
+  $('#badge').textContent = alerts; $('#badge').hidden = !alerts;
+  el.querySelectorAll('.item').forEach(row => {
+    const open = () => openEntry(snapshot[+row.dataset.i]);
+    row.addEventListener('click', e => { if (!e.target.closest('[data-del],[data-ishare]')) open(); });
+    row.addEventListener('keydown', e => { if (e.key==='Enter' && !e.target.closest('[data-del],[data-ishare]')) open(); });
+  });
+  el.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => store.del(b.dataset.del).catch(()=>toast('Couldn’t remove that. Try again.'))));
+  el.querySelectorAll('[data-ishare]').forEach(b => b.addEventListener('click', () => {
+    const i = +b.dataset.ishare, it = snapshot[i], s2 = st[i];
+    share([`${it.label}: ${s2.text}`, s2.top && `Recall: ${s2.top.title}`, s2.top?.url, '', `Checked with SIGI · ${location.origin}`].filter(x => x!==null && x!==undefined).join('\n'), it.label);
+  }));
+  mineShare = { snapshot, st };
+  renderAccount();
+}
+function openEntry(it){
+  show('check');
+  if (it.kind==='car'){ pickCar(it.make, it.model, it.year); runCar(it.make, it.model, it.year, {log:false}); }
+  else { setMode('prod'); $('#q').value = it.q || it.label; runCheck(it.q || it.label, {log:false}); }
+}
+$('#addform').addEventListener('submit', e => { e.preventDefault(); const v=$('#addq').value.trim(); if(!v) return; addItem({kind:'product', label:v, q:v}); $('#addq').value=''; });
+
+/* ================= latest ================= */
+const FILTERS = [
+  ['All', ()=>true],
+  ['Kids & baby', r => r.src==='seat' || /toy|infant|child|nursery|baby|crib|stroller|teeth|kid/i.test(r.type+' '+r.title)],
+  ['Just announced', r => r.src==='alert' || (Date.now() - new Date(r.date+'T12:00:00')) < 7*86400000],
+  ['Food', r => r.src==='fda' || r.src==='alert'],
+  ['Home & kitchen', r => /appliance|kitchen|furniture|heater|home|household|dresser|cook|lamp|light/i.test(r.type+' '+r.title)],
+  ['Batteries & fire', r => /fire|burn|battery|batteries|shock|electrocution/i.test(r.hazard+' '+r.title)],
+  ['Outdoor & sports', r => /bike|bicycle|helmet|outdoor|sport|scooter|ebike|e-bike|recreation|camp|fitness/i.test(r.type+' '+r.title)],
+];
+let fIdx = 0, shown = 25;
+function renderFilters(){
+  $('#filters').innerHTML = FILTERS.map((f,i)=>`<button class="chip" aria-pressed="${i===fIdx}" data-f="${i}">${f[0]}</button>`).join('');
+  $('#filters').querySelectorAll('.chip').forEach(b => b.addEventListener('click', () => { fIdx=+b.dataset.f; shown=25; renderFilters(); renderLatest(); }));
+}
+function renderLatest(){
+  const list = DATA.products.filter(FILTERS[fIdx][1]);
+  $('#latest').innerHTML = list.slice(0,shown).map(r=>recallCard(r)).join('') || '<div class="empty">No recalls in this group.</div>';
+  $('#more').hidden = list.length <= shown;
+}
+$('#more').addEventListener('click', () => { shown += 25; renderLatest(); });
+
+/* ================= account ================= */
+function renderAccount(){
+  if (!ME) return;
+  $('#st-watch').textContent = items.length;
+  const flagged = statusCache.filter(s=>s.v!=='get').length;
+  $('#st-flag').textContent = flagged; $('#st-flag-box').classList.toggle('alert', flagged>0);
+  $('#st-checks').textContent = checks.length;
+  const el = $('#history');
+  if (!checks.length){ el.innerHTML = `<div><span class="hint">Your checks will show up here.</span></div>`; return; }
+  el.innerHTML = '';
+  checks.slice(0,8).forEach(h => {
+    const b = document.createElement('button'); b.className='hist';
+    b.innerHTML = `<span class="l"><span class="dot ${(VERD[h.verdict]||VERD.get)[1]}"></span><span></span></span><span class="w"></span>`;
+    b.querySelector('.l span:last-child').textContent = h.label;
+    b.querySelector('.w').textContent = ago(h.at);
+    b.addEventListener('click', () => openEntry(h));
+    el.appendChild(b);
+  });
+}
+$('#clear-hist').addEventListener('click', async () => {
+  if (!checks.length) return;
+  try { await store.clearChecks(); toast('Recent checks cleared'); } catch(e){ toast('Couldn’t clear them. Try again.'); }
+});
+
+/* ================= tabs ================= */
+function show(p){
+  $$('.tab').forEach(t => t.setAttribute('aria-selected', t.dataset.p===p));
+  ['check','mine','latest','account'].forEach(x => $('#p-'+x).hidden = x!==p);
+  $('#main').scrollTop = 0;
+  try { history.replaceState(null,'','#'+p); } catch(e){}
+}
+$$('.tab').forEach(t => t.addEventListener('click', () => show(t.dataset.p)));
+function setMode(m){
+  $('#mode-prod').setAttribute('aria-pressed', m==='prod'); $('#mode-car').setAttribute('aria-pressed', m==='car');
+  $('#prod-form').hidden = m!=='prod'; $('#car-form').hidden = m!=='car'; $('#result').innerHTML='';
+}
+$('#mode-prod').addEventListener('click', ()=>setMode('prod'));
+$('#mode-car').addEventListener('click', ()=>setMode('car'));
+$('#qform').addEventListener('submit', e => { e.preventDefault(); runCheck($('#q').value); });
+
+const EX = ['Graco Milestone','Govee space heater','baby walker','e-bike','2021 Honda Accord'];
+$('#examples').innerHTML = '<span class="hint" style="align-self:center">Try:</span>' + EX.map(x=>`<button class="chip" type="button">${x}</button>`).join('');
+$('#examples').querySelectorAll('.chip').forEach(b => b.addEventListener('click', () => {
+  const t=b.textContent;
+  if (t==='2021 Honda Accord'){ pickCar('HONDA','ACCORD','2021'); runCar('HONDA','ACCORD','2021'); return; }
+  $('#q').value=t; runCheck(t);
+}));
+
+/* ================= live data ================= */
+let dataFetchedAt = 0;
+async function loadData(){
+  const r = await fetch('data/data.json', { cache:'no-cache' });
+  if (!r.ok) throw new Error('data');
+  const d = await r.json();
+  const changed = !DATA || d.asOf !== DATA.asOf;
+  const oldIds = DATA ? new Set(DATA.products.map(x => x.id)) : null;
+  dataFetchedAt = Date.now();
+  if (!changed) return 0;
+  DATA = d; buildIndex();
+  return oldIds ? d.products.filter(x => !oldIds.has(x.id)).length : 0;
+}
+function showFresh(){
+  if (!DATA) return;
+  const t = DATA.asOf.length > 10 ? since(DATA.asOf) : fmtDate(DATA.asOf);
+  const live = DATA.asOf.length > 10 && (Date.now() - new Date(DATA.asOf)) < 2*3600000;
+  const html = `${live ? '<span class="live-dot"></span>Live' : 'Recall data'} · updated ${t}`;
+  $$('.fresh').forEach(el => el.innerHTML = html);
+  $('#d-asof').textContent = DATA.asOf.length > 10 ? new Date(DATA.asOf).toLocaleString(undefined,{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}) : fmtDate(DATA.asOf);
+}
+async function refreshData(){
+  if (document.hidden || Date.now() - dataFetchedAt < 5*60000) { showFresh(); return; }
+  try {
+    const added = await loadData();
+    showFresh();
+    if (added){ renderLatest(); renderMine(); toast(`${added} new recall${added>1?'s':''} just came in`); }
+  } catch(e){}
+}
+setInterval(refreshData, 60000);
+document.addEventListener('visibilitychange', refreshData);
+
+/* ================= boot ================= */
+async function boot(){
+  try { CONFIG = await (await fetch('/api/config')).json(); } catch(e){ CONFIG = {}; }
+  if (CONFIG.supabaseUrl && CONFIG.supabaseAnonKey && window.supabase){
+    sb = window.supabase.createClient(CONFIG.supabaseUrl, CONFIG.supabaseAnonKey, { auth: { persistSession: true, detectSessionInUrl: true } });
+  } else {
+    $('#login-form').hidden = true; $('.or').hidden = true;
+    $('#auth-fine').textContent = 'Sign-in isn’t set up on this server yet, so lists stay on this device.';
+  }
+  try { await loadData(); }
+  catch(e){ $('#auth-fine').textContent = 'Couldn’t load the recall list. Reload to try again.'; return; }
+  opt($('#mk'), Object.keys(DATA.makes).sort(), 'Make');
+  const nCars = Object.keys(DATA.makes).length;
+  $('#proof').innerHTML = `<div><b>${DATA.products.filter(r=>r.src==='cpsc').length.toLocaleString()}</b>product recalls</div><div><b>${DATA.products.filter(r=>r.src!=='cpsc').length.toLocaleString()}</b>food &amp; seat</div><div><b>${nCars}</b>vehicle makes</div>`;
+  showFresh();
+  $('#d-prod').textContent = DATA.products.length.toLocaleString() + ' since ' + fmtDate(DATA.products[DATA.products.length-1].date);
+  $('#d-makes').textContent = nCars + ' makes · 2012–' + (new Date(DATA.asOf).getFullYear()+1);
+  renderFilters(); renderLatest();
+  $('#q').value='Govee space heater'; runCheck('Govee space heater', {log:false});
+
+  if (sb){
+    const { data: { session } } = await sb.auth.getSession();
+    if (session) await enterAs(session);
+    else if (lsGet('sigi-guest-mode', false)) await enterAs(null);
+    sb.auth.onAuthStateChange((evt, s) => {
+      if (evt==='SIGNED_IN' && s && ME?.id !== s.user.id) { lsSet('sigi-guest-mode', null); enterAs(s); }
+      if (evt==='SIGNED_OUT' && ME?.mode==='user') showAuth();
+    });
+  } else if (lsGet('sigi-guest-mode', false)) await enterAs(null);
+}
+boot();
+})();
+
+</script>
+</body>
+</html>
